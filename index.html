@@ -3,320 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UMO CLOUD - Nhận Token Nạp Tiền</title>
+    <title>UMO CLOUD - Xác Thực & Nhận Token</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Thư viện tạo hiệu ứng pháo hoa -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(135deg, #09080e, #1a153a, #0f0c29);
+            background: #09080e; 
             color: white; 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
+            min-height: 100vh; 
+            padding: 20px; 
+            overflow-x: hidden; 
         }
 
-        /* Hiệu ứng nền chuyển động */
-        .bg-animation {
+        /* Nền động lưới Cyber */
+        .cyber-grid {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -2;
+            perspective: 500px;
+            animation: gridMove 10s linear infinite;
+        }
+        @keyframes gridMove { 100% { background-position: 0 30px; } }
+        
+        .glow-bg {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px; height: 300px;
+            background: rgba(0, 255, 204, 0.2);
+            filter: blur(100px);
             z-index: -1;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.1) 0%, transparent 50%);
-            animation: pulse 5s infinite alternate;
+            animation: pulse 4s infinite alternate;
         }
+        @keyframes pulse { 100% { transform: translate(-50%, -50%) scale(1.5); } }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.5); opacity: 1; }
-        }
-
-        .container {
-            background: rgba(20, 20, 30, 0.7); 
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(0, 255, 204, 0.2);
-            padding: 30px; 
-            border-radius: 24px; 
-            text-align: center;
-            width: 100%;
-            max-width: 450px; 
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0, 255, 204, 0.15);
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Hiệu ứng viền sáng */
-        .container::before {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(45deg, #00ffcc, #0088cc, #00ffcc);
-            z-index: -1;
-            border-radius: 26px;
-            background-size: 400%;
-            animation: borderAnim 10s linear infinite;
-        }
-
-        @keyframes borderAnim {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 400% 50%; }
-        }
-
-        h1 { 
-            font-family: 'Orbitron', sans-serif; 
-            color: #fff; 
-            font-size: 22px; 
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .status-badge {
-            display: inline-block;
-            background: rgba(0, 255, 204, 0.15);
-            color: #00ffcc;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 20px;
+        .container { 
+            background: rgba(15, 15, 25, 0.85); 
+            backdrop-filter: blur(20px);
             border: 1px solid rgba(0, 255, 204, 0.3);
-            animation: blink 2s infinite;
+            padding: 35px 25px; 
+            border-radius: 20px; 
+            text-align: center; 
+            width: 100%; 
+            max-width: 450px; 
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 255, 204, 0.1); 
+            position: relative;
         }
 
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
+        /* Viền sáng chạy xung quanh */
+        .container::before { 
+            content: ''; position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; 
+            background: linear-gradient(90deg, #00ffcc, #0088cc, #00ffcc, #0088cc); 
+            z-index: -1; border-radius: 22px; background-size: 400%; 
+            animation: borderAnim 8s linear infinite; opacity: 0.5;
+        }
+        @keyframes borderAnim { 0% { background-position: 0% 50%; } 100% { background-position: 400% 50%; } }
+
+        .logo { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 24px; color: #00ffcc; 
+            letter-spacing: 3px; margin-bottom: 5px; 
+            text-shadow: 0 0 10px rgba(0,255,204,0.5);
+        }
+        
+        .status-box {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-bottom: 25px;
+            border-left: 3px solid #00ffcc;
         }
 
-        .info-text { font-size: 14px; color: #aaa; margin-bottom: 15px; }
+        /* Khu vực load/đếm ngược */
+        #loading-area {
+            padding: 30px 0;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(0, 255, 204, 0.2);
+            border-top: 3px solid #00ffcc;
+            border-radius: 50%;
+            margin: 0 auto 20px auto;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .countdown-text { font-family: 'Orbitron', sans-serif; font-size: 30px; color: #fff; margin-bottom: 10px; }
+        .loading-text { font-size: 13px; color: #aaa; }
 
-        /* Khung Token */
+        /* Khu vực hiện Token */
+        #result-area { display: none; }
+        
         .token-box { 
             background: #000; 
             border: 2px dashed #00ffcc; 
             border-radius: 15px; 
             padding: 25px 15px; 
-            margin-bottom: 20px; 
-            position: relative;
-            overflow: hidden;
+            margin: 20px 0; 
+            position: relative; 
             box-shadow: inset 0 0 20px rgba(0, 255, 204, 0.1);
         }
-
-        .token-box::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transform: skewX(-20deg);
-            animation: shine 3s infinite;
-        }
-
-        @keyframes shine {
-            100% { left: 200%; }
-        }
-
         .token-text { 
-            font-family: 'Orbitron', sans-serif;
-            font-size: 32px; 
-            color: #fff; 
-            letter-spacing: 5px; 
-            font-weight: 900;
-            text-shadow: 0 0 20px #00ffcc, 0 0 40px #00ffcc;
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 32px; color: #fff; 
+            letter-spacing: 4px; font-weight: 900; 
+            text-shadow: 0 0 20px #00ffcc; 
+        }
+
+        .url-container {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 12px;
             word-break: break-all;
+            border: 1px solid rgba(255,255,255,0.1);
         }
+        .url-container a { color: #00ffcc; text-decoration: none; }
 
-        /* Nút bấm */
         .btn { 
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
+            border: none; padding: 15px; border-radius: 10px; 
+            font-size: 16px; font-weight: 600; cursor: pointer; 
+            width: 100%; margin-bottom: 12px; transition: all 0.3s ease; 
+            display: flex; justify-content: center; align-items: center; gap: 10px; 
+            text-decoration: none; font-family: 'Poppins', sans-serif;
         }
-
-        .btn-copy { background: #00ffcc; color: #09080e; box-shadow: 0 5px 15px rgba(0, 255, 204, 0.3); }
-        .btn-copy:hover { background: #00ccaa; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 255, 204, 0.5); }
         
-        .btn-tele { background: linear-gradient(45deg, #0088cc, #00aaff); color: white; box-shadow: 0 5px 15px rgba(0, 136, 204, 0.3); }
-        .btn-tele:hover { background: linear-gradient(45deg, #006699, #0088cc); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 136, 204, 0.5); }
-
-        .btn:active { transform: scale(0.98); }
-
-        /* Cảnh báo */
-        .warning {
-            font-size: 13px;
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            border-left: 4px solid #ff6b6b;
-            text-align: left;
-            margin-top: 20px;
+        .btn-copy { background: #00ffcc; color: #000; }
+        .btn-copy:active { background: #00ccaa; }
+        
+        .btn-tele { 
+            background: linear-gradient(45deg, #0088cc, #00aaff); color: white; 
+            box-shadow: 0 0 20px rgba(0, 136, 204, 0.4);
+            animation: pulse-btn 2s infinite;
         }
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(0, 136, 204, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0); } }
+
+        .warning { font-size: 12px; color: #ff6b6b; text-align: left; margin-top: 15px; line-height: 1.5; }
 
         /* Toast thông báo */
-        .toast { 
-            position: fixed; 
-            top: -100px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            background: #00ffcc; 
-            color: #09080e; 
-            padding: 12px 25px; 
-            border-radius: 30px; 
-            font-weight: 700; 
-            box-shadow: 0 10px 30px rgba(0, 255, 204, 0.5); 
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: #00ffcc; color: #000; padding: 12px 25px; border-radius: 30px; font-weight: 700; transition: all 0.4s ease; z-index: 100; }
         .toast.show { top: 20px; }
-
-        /* Hướng dẫn các bước */
-        .steps {
-            text-align: left;
-            margin-bottom: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px;
-            border-radius: 12px;
-        }
-        .step {
-            font-size: 13px;
-            color: #ccc;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .step:last-child { margin-bottom: 0; }
-        .step-icon {
-            background: #00ffcc;
-            color: #000;
-            width: 20px; height: 20px;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 12px;
-            flex-shrink: 0;
-        }
     </style>
 </head>
 <body>
-
-    <!-- Nền chuyển động -->
-    <div class="bg-animation"></div>
-
-    <!-- Thông báo Copy -->
-    <div class="toast" id="toast">✅ Đã copy Token vào bộ nhớ tạm!</div>
+    <div class="cyber-grid"></div>
+    <div class="glow-bg"></div>
+    <div class="toast" id="toast">✅ Đã copy Token!</div>
 
     <div class="container">
-        <h1>UMO CLOUD</h1>
-        <div class="status-badge">● VƯỢT LINK THÀNH CÔNG</div>
-        
-        <p class="info-text">Hệ thống đã ghi nhận IP và tạo Token nạp tiền <b>1.200đ</b> cho bạn.</p>
+        <div class="logo">UMO CLOUD</div>
+        <div class="status-box">🟢 Kết nối bảo mật SSL</div>
 
-        <!-- Hướng dẫn -->
-        <div class="steps">
-            <div class="step"><span class="step-icon">1</span> Copy mã Token bên dưới.</div>
-            <div class="step"><span class="step-icon">2</span> Bấm nút Mở Bot Telegram.</div>
-            <div class="step"><span class="step-icon">3</span> Dán Token vào Bot để nhận tiền.</div>
+        <!-- KHU VỰC CHỜ -->
+        <div id="loading-area">
+            <div class="spinner"></div>
+            <div class="countdown-text" id="countdown">5</div>
+            <div class="loading-text">Hệ thống đang xử lý IP và tạo Token...</div>
         </div>
 
-        <div class="token-box">
-            <div class="token-text" id="displayKey">ĐANG TẠO...</div>
-        </div>
+        <!-- KHU VỰC KẾT QUẢ -->
+        <div id="result-area">
+            <p style="font-size: 14px; color: #ccc; margin-bottom: 10px;">Token nạp 1.200đ của bạn đã sẵn sàng!</p>
+            
+            <div class="token-box">
+                <div class="token-text" id="displayKey">...</div>
+            </div>
 
-        <button class="btn btn-copy" onclick="copyToken()">
-            📋 COPY TOKEN
-        </button>
-        
-        <!-- Link Deep Link Telegram -->
-        <a href="#" id="teleLink" class="btn btn-tele">
-            🚀 MỞ BOT TELEGRAM
-        </a>
-        
-        <div class="warning">
-            ⚠️ <b>Lưu ý:</b> Mã này chỉ sử dụng được 1 lần duy nhất. Nếu cố tình gian lận (Bypass), hệ thống sẽ tự động BAN vĩnh viễn IP và tài khoản Telegram của bạn.
+            <div class="url-container">
+                🔗 Link Token: <br>
+                <a href="#" id="urlText" target="_blank">Đang tạo...</a>
+            </div>
+
+            <button class="btn btn-copy" onclick="copyToken()">📋 COPY TOKEN</button>
+            <a href="#" id="teleLink" class="btn btn-tele">🚀 MỞ BOT & NẠP TỰ ĐỘNG</a>
+            
+            <div class="warning">
+                ⚠️ <b>Cảnh báo:</b> Token chỉ có hiệu lực 1 lần. Nghiêm cấm sử dụng Tool Bypass. Nếu vi phạm, hệ thống sẽ tự động BAN vĩnh viễn IP và Telegram.
+            </div>
         </div>
     </div>
 
     <script>
         let currentToken = "";
-        // THAY TÊN BOT CỦA BẠN VÀO ĐÂY (Không có chữ @)
+        // THAY TÊN BOT CỦA BẠN VÀO ĐÂY
         const botUsername = "NhanCodeUmoTrialBot"; 
 
-        // Hàm tạo Token
         function generateToken() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             let result = '';
-            for (let i = 0; i < 8; i++) { 
-                result += chars.charAt(Math.floor(Math.random() * chars.length)); 
-            }
+            for (let i = 0; i < 8; i++) { result += chars.charAt(Math.floor(Math.random() * chars.length)); }
             return 'UMO-' + result;
         }
 
-        // Chạy khi tải trang
+        // Hiệu ứng đếm ngược 5 giây
         window.onload = function() {
-            // Giả lập loading 1 giây cho kịch tính
-            setTimeout(() => {
-                currentToken = generateToken();
-                document.getElementById('displayKey').innerText = currentToken;
+            let timeLeft = 5;
+            const countdownEl = document.getElementById('countdown');
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdownEl.innerText = timeLeft;
                 
-                // Tạo Deep Link
-                const teleUrl = `https://t.me/${botUsername}?start=${currentToken}`;
-                document.getElementById('teleLink').href = teleUrl;
-
-                // Bắn pháo hoa chúc mừng
-                confetti({
-                    particleCount: 150,
-                    spread: 70,
-                    origin: { y: 0.6 },
-                    colors: ['#00ffcc', '#0088cc', '#ffffff']
-                });
-            }, 800);
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    showResult();
+                }
+            }, 1000);
         };
 
-        // Hàm Copy
+        function showResult() {
+            // Ẩn loading, hiện kết quả
+            document.getElementById('loading-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+
+            // Tạo Token
+            currentToken = generateToken();
+            document.getElementById('displayKey').innerText = currentToken;
+
+            // Tạo Link
+            const teleUrl = `https://t.me/${botUsername}?start=${currentToken}`;
+            document.getElementById('teleLink').href = teleUrl;
+            
+            const urlText = document.getElementById('urlText');
+            urlText.href = teleUrl;
+            urlText.innerText = teleUrl;
+
+            // Bắn pháo hoa
+            confetti({
+                particleCount: 150,
+                spread: 80,
+                origin: { y: 0.6 },
+                colors: ['#00ffcc', '#0088cc', '#ffffff']
+            });
+        }
+
         function copyToken() {
             if(currentToken === "") return;
-            
             navigator.clipboard.writeText(currentToken).then(() => {
                 const toast = document.getElementById('toast');
                 toast.classList.add('show');
-                setTimeout(() => { 
-                    toast.classList.remove('show'); 
-                }, 2500);
-            }).catch(err => { 
-                alert("Lỗi khi copy: " + err); 
-            });
+                setTimeout(() => { toast.classList.remove('show'); }, 2500);
+            }).catch(err => { alert("Lỗi copy: " + err); });
         }
     </script>
 </body>
