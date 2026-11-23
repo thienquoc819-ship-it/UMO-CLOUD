@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UMO CODE - Nhận Token Nạp Tiền</title>
+    <!-- Nhúng Font chữ xịn từ Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .box { 
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px; 
+            border-radius: 20px; 
+            text-align: center;
+            width: 100%;
+            max-width: 450px; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 255, 204, 0.1);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #00ffcc;
+            font-size: 22px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.5);
+        }
+
+        p { font-size: 14px; color: #b3b3b3; margin-bottom: 20px; }
+
+        .key-container {
+            background: #111;
+            border: 2px dashed #00ffcc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .key-container::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 255, 204, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) rotate(45deg); }
+        }
+
+        .key { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 32px; 
+            color: #fff; 
+            letter-spacing: 4px; 
+            font-weight: 700;
+            text-shadow: 0 0 15px #00ffcc;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-copy {
+            background: #00ffcc;
+            color: #0f0c29;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-copy:hover { background: #00ccaa; transform: scale(1.02); }
+        .btn-copy:active { transform: scale(0.98); }
+
+        .btn-tele {
+            background: #0088cc;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            display: block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-tele:hover { background: #006699; transform: scale(1.02); }
+
+        .note { font-size: 12px; color: #ff6b6b; margin-top: 15px; font-style: italic; }
+
+        /* Hiệu ứng thông báo Copy */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: #00ffcc;
+            color: #0f0c29;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 255, 204, 0.4);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 100;
+        }
+        
+        .toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Thông báo Copy thành công -->
+    <div class="toast" id="toast">Đã copy Token!</div>
+
+    <div class="box">
+        <h2>VƯỢT LINK THÀNH CÔNG!</h2>
+        <p>Mã Token nạp tiền (1.200đ) của bạn:</p>
+        
+        <div class="key-container">
+            <div class="key" id="displayKey">...</div>
+        </div>
+
+        <button class="btn-copy" onclick="copyToken()">📋 Copy Token</button>
+        <a href="https://t.me/NhanCodeUmoTrialBot" class="btn-tele">🚀 MỞ BOT TELEGRAM</a>
+        
+        <div class="note">* Mã này chỉ sử dụng được 1 lần duy nhất.</div>
+    </div>
+
+    <script>
+        let currentToken = "";
+
+        // Tạo Token ngẫu nhiên
+        function generateToken() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return 'UMO-' + result;
+        }
+
+        // Chạy khi tải trang
+        window.onload = function() {
+            currentToken = generateToken();
+            document.getElementById('displayKey').innerText = currentToken;
+        };
+
+        // Hàm Copy
+        function copyToken() {
+            navigator.clipboard.writeText(currentToken).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                
+                // Tự động ẩn sau 2 giây
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                alert("Lỗi khi copy: " + err);
+            });
+        }
+    </script>
+</body>
+</html>
